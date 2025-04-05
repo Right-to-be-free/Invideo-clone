@@ -1,14 +1,17 @@
+// src/components/Navbar.tsx
+
 import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <header className="w-full border-b py-4 px-6 flex justify-between items-center">
-      <Link href="/" className="text-xl font-bold text-blue-600">Invideo Clone</Link>
-      <nav className="space-x-6 text-sm text-gray-600">
-        <Link href="/templates">Templates</Link>
-        <Link href="/pricing">Pricing</Link>
-        <Link href="/login" className="font-medium text-blue-600">Login</Link>
-      </nav>
-    </header>
+    <nav className="bg-white shadow px-6 py-4 flex justify-between items-center">
+      <div className="text-xl font-bold text-blue-600">🎬 Invideo Clone</div>
+      <div className="space-x-4 text-gray-800">
+        <Link href="/" className="hover:text-blue-600">Home</Link>
+        <Link href="/create" className="hover:text-blue-600">Create</Link>
+        <Link href="/login" className="hover:text-blue-600">Login</Link>
+        <Link href="/signup" className="hover:text-blue-600">Signup</Link>
+      </div>
+    </nav>
   );
 }
