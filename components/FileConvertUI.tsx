@@ -15,23 +15,35 @@ export default function FileConvertUI() {
     setPreviewURL(URL.createObjectURL(file));
 
     const ext = file.name.split(".").pop()?.toLowerCase();
-    if (["jpg", "jpeg", "png"].includes(ext)) setFileType("image");
-    else if (ext === "pdf") setFileType("pdf");
-    else if (["docx", "doc"].includes(ext)) setFileType("word");
-    else setFileType("unknown");
+    if (["jpg", "jpeg", "png"].includes(ext)) {
+      setFileType("image");
+    } else if (ext === "pdf") {
+      setFileType("pdf");
+    } else if (["docx", "doc"].includes(ext)) {
+      setFileType("word");
+    } else {
+      setFileType("unknown");
+    }
   };
 
   const handleConvert = () => {
-    if (!selectedFile) return alert("❗ No file selected");
+    if (!selectedFile) {
+      alert("❗ No file selected");
+      return;
+    }
 
-    if (fileType === "image") {
-      alert("🖼️ Image → PDF conversion coming soon...");
-    } else if (fileType === "word") {
-      alert("📄 DOCX → PDF conversion coming soon...");
-    } else if (fileType === "pdf") {
-      alert("🔄 PDF → Word/Image coming soon...");
-    } else {
-      alert("⚠️ Unsupported file type");
+    switch (fileType) {
+      case "image":
+        alert("🖼️ Image → PDF conversion coming soon...");
+        break;
+      case "word":
+        alert("📄 DOCX → PDF conversion coming soon...");
+        break;
+      case "pdf":
+        alert("🔄 PDF → Word/Image coming soon...");
+        break;
+      default:
+        alert("⚠️ Unsupported file type");
     }
   };
 
