@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/supabaseClient"; // ✅ make sure this path is correct
+import { supabase } from "../lib/supabaseClient"; // ✅ make sure this path is correct
 
 export default function FileConvertUI() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
