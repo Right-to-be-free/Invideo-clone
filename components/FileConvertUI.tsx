@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "../lib/supabaseClient"; // ✅ make sure this path is correct
 
 export default function FileConvertUI() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -16,9 +15,9 @@ export default function FileConvertUI() {
     setPreviewURL(URL.createObjectURL(file));
 
     const ext = file.name.split(".").pop()?.toLowerCase();
-    if (ext === "jpg" || ext === "jpeg" || ext === "png") setFileType("image");
-    else if (ext === "pdf") setFileType("pdf");
-    else if (ext === "docx" || ext === "doc") setFileType("word");
+    if (["jpg", "jpeg", "png"].includes(ext)) setFileType("image");
+    else if (["pdf"].includes(ext)) setFileType("pdf");
+    else if (["docx", "doc"].includes(ext)) setFileType("word");
     else setFileType("unknown");
   };
 
@@ -33,16 +32,6 @@ export default function FileConvertUI() {
       alert("🔄 PDF → Word/Image coming soon...");
     } else {
       alert("⚠️ Unsupported file type");
-    }
-  };
-
-  // ✅ Handle sign out using Supabase
-  const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      alert("Failed to sign out: " + error.message);
-    } else {
-      window.location.href = "/"; // or redirect to /login
     }
   };
 
@@ -75,12 +64,15 @@ export default function FileConvertUI() {
           Convert
         </button>
 
+        {/* 🔒 Disabled until Supabase auth is wired up */}
+        {/* 
         <button
           className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
           onClick={handleSignOut}
         >
           Sign Out
-        </button>
+        </button> 
+        */}
       </div>
     </div>
   );
