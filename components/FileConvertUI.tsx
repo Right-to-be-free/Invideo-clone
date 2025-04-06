@@ -16,7 +16,7 @@ export default function FileConvertUI() {
 
     const ext = file.name.split(".").pop()?.toLowerCase();
     if (["jpg", "jpeg", "png"].includes(ext)) setFileType("image");
-    else if (["pdf"].includes(ext)) setFileType("pdf");
+    else if (ext === "pdf") setFileType("pdf");
     else if (["docx", "doc"].includes(ext)) setFileType("word");
     else setFileType("unknown");
   };
@@ -63,16 +63,6 @@ export default function FileConvertUI() {
         >
           Convert
         </button>
-
-        {/* 🔒 Disabled until Supabase auth is wired up */}
-        {/* 
-        <button
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-          onClick={handleSignOut}
-        >
-          Sign Out
-        </button> 
-        */}
       </div>
     </div>
   );
