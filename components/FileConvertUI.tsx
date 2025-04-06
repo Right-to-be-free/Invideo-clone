@@ -14,7 +14,9 @@ export default function FileConvertUI() {
     setSelectedFile(file);
     setPreviewURL(URL.createObjectURL(file));
 
-    const ext = file.name.split(".").pop()?.toLowerCase();
+    // ✅ Safely get file extension, even if undefined
+    const ext = (file.name.split(".").pop() || "").toLowerCase();
+
     if (["jpg", "jpeg", "png"].includes(ext)) {
       setFileType("image");
     } else if (ext === "pdf") {
