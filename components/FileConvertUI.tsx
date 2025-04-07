@@ -14,7 +14,7 @@ export default function FileConvertUI() {
     setSelectedFile(file);
     setPreviewURL(URL.createObjectURL(file));
 
-    // ✅ Safely get file extension, even if undefined
+
     const ext = (file.name.split(".").pop() || "").toLowerCase();
 
     if (["jpg", "jpeg", "png"].includes(ext)) {
