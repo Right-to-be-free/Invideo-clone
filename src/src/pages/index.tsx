@@ -6,7 +6,7 @@ export default function Home() {
       {/* Hero Section */}
       <div className="max-w-4xl mx-auto text-center space-y-6">
         <h1 className="text-4xl md:text-5xl font-bold text-gray-800">
-         All In One Editor
+          Invideo Clone
         </h1>
         <p className="text-lg text-gray-600">
           Powerful tools, beautiful templates, and AI magic — all in one platform.
@@ -23,7 +23,7 @@ export default function Home() {
       <section className="py-20 bg-gray-50 mt-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
-            Why Choose All In One Editor?
+            Why Choose Invideo Clone?
           </h2>
 
           <div className="grid md:grid-cols-3 gap-8">

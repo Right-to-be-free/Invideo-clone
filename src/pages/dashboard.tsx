@@ -1,120 +1,174 @@
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import Link from "next/link";
-import { supabase } from "../lib/supabaseClient";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import React, { useState } from "react";
 
-// Sample mock video data
-const videoMockData = [
-  { title: "AI Promo Video", thumbnail: "/thumb1.jpg" },
-  { title: "Product Demo", thumbnail: "/thumb2.jpg" },
-  { title: "Launch Teaser", thumbnail: "/thumb3.jpg" },
-  { title: "Tutorial", thumbnail: "/thumb4.jpg" },
-];
+export default function DashboardPage() {
+  const [activeTab, setActiveTab] = useState("convert");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [conversionType, setConversionType] = useState("word-to-pdf");
+  const [convertedUrl, setConvertedUrl] = useState<string | null>(null);
 
-const chartMockData = [
-  { name: "Jan", videos: 12 },
-  { name: "Feb", videos: 18 },
-  { name: "Mar", videos: 24 },
-  { name: "Apr", videos: 10 },
-];
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setSelectedFiles(files);
+    setConvertedUrl(null);
+  };
 
-export default function Dashboard() {
-  const [search, setSearch] = useState("");
-  const [filteredVideos, setFilteredVideos] = useState(videoMockData);
-  const [loading, setLoading] = useState(false);
+  const handleProcess = async () => {
+    if (!selectedFiles.length) return alert("Please select a file");
 
-  useEffect(() => {
-    setFilteredVideos(
-      videoMockData.filter((video) =>
-        video.title.toLowerCase().includes(search.toLowerCase())
-      )
-    );
-  }, [search]);
+    const formData = new FormData();
+    formData.append("file", selectedFiles[0]);
+    formData.append("conversionType", conversionType);
 
-  return (
-    <main className="min-h-screen bg-gray-100 p-6 space-y-10">
-      {/* Header and action */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-        <Link
-          href="/create"
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-        >
-          + Create New Video
-        </Link>
-      </div>
+    try {
+      const res = await fetch("/api/convert", {
+        method: "POST",
+        body: formData,
+      });
 
-      {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card title="Total Videos" value="36" />
-        <Card title="Monthly Views" value="12.4K" />
-        <Card title="Subscribers" value="1.2K" />
-      </div>
+      if (res.ok) {
+        const data = await res.json();
+        setConvertedUrl(data.downloadUrl);
+      } else {
+        alert("Conversion failed.");
+      }
+    } catch (err) {
+      console.error("Error during conversion:", err);
+      alert("Something went wrong.");
+    }
+  };
 
-      {/* Search Bar */}
-      <div>
-        <input
-          type="text"
-          placeholder="Search videos..."
-          className="w-full max-w-md px-4 py-2 border rounded-md focus:ring focus:ring-blue-200"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
+  const renderTab = () => {
+    return (
+      <div className="bg-white shadow rounded-lg p-6 mt-4">
+        {activeTab === "convert" && (
+          <>
+            <h2 className="text-lg font-semibold mb-4">Convert Files</h2>
+            <div className="mb-6">
+              <label className="block text-sm font-medium mb-2">Conversion Type</label>
+              <select
+                className="w-full border px-3 py-2 rounded text-sm"
+                value={conversionType}
+                onChange={(e) => setConversionType(e.target.value)}
+              >
+                <option value="word-to-pdf">Word → PDF</option>
+                <option value="jpeg-to-pdf">JPEG → PDF</option>
+                <option value="pdf-to-jpeg">PDF → JPEG</option>
+                <option value="pdf-to-png">PDF → PNG</option>
+              </select>
+            </div>
+          </>
+        )}
 
-      {/* Videos */}
-      <div className="bg-white p-6 rounded-xl shadow">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">Recent Videos</h2>
-        {loading ? (
-          <div className="text-center py-10 text-gray-500">Loading...</div>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredVideos.map((video, idx) => (
-              <VideoCard key={idx} title={video.title} thumbnail={video.thumbnail} />
-            ))}
+        <div className="border-dashed border-2 border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-all">
+          <input
+            type="file"
+            id="fileUpload"
+            className="hidden"
+            onChange={handleFileSelect}
+          />
+          <label htmlFor="fileUpload" className="cursor-pointer flex flex-col items-center">
+            <div className="text-4xl mb-2">🖼️</div>
+            <p className="text-base text-gray-700">Drag and drop files here</p>
+            <p className="text-sm text-gray-500">or click to browse</p>
+          </label>
+        </div>
+
+        {selectedFiles.length > 0 && (
+          <div className="mt-4 bg-gray-50 p-4 rounded shadow-inner">
+            <h3 className="text-sm font-semibold mb-2">Selected Files</h3>
+            <ul className="text-sm text-gray-700 space-y-1">
+              {selectedFiles.map((file, i) => (
+                <li key={i}>📎 {file.name}</li>
+              ))}
+            </ul>
+            <button
+              onClick={handleProcess}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              🔄 Process Conversion
+            </button>
+
+            {convertedUrl && (
+              <div className="mt-4">
+                <a
+                  href={convertedUrl}
+                  download
+                  className="inline-block px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                >
+                  ⬇️ Download Converted File
+                </a>
+              </div>
+            )}
           </div>
         )}
       </div>
+    );
+  };
 
-      {/* Charts */}
-      <div className="bg-white p-6 rounded-xl shadow">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">Monthly Uploads</h2>
-        <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={chartMockData}>
-            <XAxis dataKey="name" stroke="#4B5563" />
-            <YAxis stroke="#4B5563" />
-            <Tooltip />
-            <Bar dataKey="videos" fill="#3B82F6" radius={[5, 5, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+  return (
+    <div className="min-h-screen bg-gray-900 text-white p-8">
+      <header className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">📁 Dashboard – File Tools</h1>
+        <div className="space-x-2">
+          <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Dashboard</button>
+          <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Templates</button>
+          <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">+ Create</button>
+        </div>
+      </header>
+
+      <div className="bg-white text-gray-800 rounded-lg shadow-md p-4">
+        <div className="flex border-b">
+          {["convert", "merge", "compress", "edit"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 font-medium text-sm ${
+                activeTab === tab
+                  ? "text-blue-600 border-b-2 border-blue-500"
+                  : "text-gray-600 hover:text-blue-500"
+              }`}
+            >
+              {tab === "convert" && "🔄 Convert"}
+              {tab === "merge" && "🔗 Merge"}
+              {tab === "compress" && "🗜️ Compress"}
+              {tab === "edit" && "🕋️ Edit"}
+            </button>
+          ))}
+        </div>
+        {renderTab()}
       </div>
-    </main>
-  );
-}
 
-function Card({ title, value }: { title: string; value: string }) {
-  return (
-    <div className="bg-white p-6 rounded-xl shadow text-center">
-      <h3 className="text-lg font-medium text-gray-600">{title}</h3>
-      <p className="text-2xl font-bold text-blue-600 mt-2">{value}</p>
-    </div>
-  );
-}
-
-function VideoCard({ title, thumbnail }: { title: string; thumbnail: string }) {
-  return (
-    <div className="border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
-      <img src={thumbnail} alt={title} className="w-full h-40 object-cover" />
-      <div className="p-4">
-        <h4 className="text-md font-semibold text-gray-800">{title}</h4>
+      <div className="bg-white text-gray-800 rounded-lg shadow-md mt-8 p-6">
+        <h2 className="text-lg font-semibold mb-4">⚙️ Features</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div className="p-4 bg-gray-100 rounded">
+            <strong>✅ File Conversion</strong>
+            <ul className="list-disc ml-5 mt-2 text-gray-600">
+              <li>Word, PDF, JPEG</li>
+              <li>Image ↔ PDF ↔ DOCX</li>
+            </ul>
+          </div>
+          <div className="p-4 bg-gray-100 rounded">
+            <strong>🔗 File Merging</strong>
+            <ul className="list-disc ml-5 mt-2 text-gray-600">
+              <li>PDFs, images to single file</li>
+            </ul>
+          </div>
+          <div className="p-4 bg-gray-100 rounded">
+            <strong>🗜️ Compression</strong>
+            <ul className="list-disc ml-5 mt-2 text-gray-600">
+              <li>Image & PDF compression</li>
+              <li>Resize & reduce size</li>
+            </ul>
+          </div>
+          <div className="p-4 bg-gray-100 rounded">
+            <strong>🕋️ Inline Editing</strong>
+            <ul className="list-disc ml-5 mt-2 text-gray-600">
+              <li>Edit DOCX, TXT, Markdown</li>
+              <li>Basic image editor</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );
