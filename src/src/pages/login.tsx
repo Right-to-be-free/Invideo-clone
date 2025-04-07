@@ -1,4 +1,4 @@
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from '../lib/supabaseClient';
 import { useRouter } from "next/router";
 import { useState } from "react";
 import Link from "next/link";
